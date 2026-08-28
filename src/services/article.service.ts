@@ -1,4 +1,4 @@
-import type { RowDataPacket } from "mysql2";
+import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { db } from "../config/database.js";
 
 export interface ArticleRow extends RowDataPacket {
@@ -24,4 +24,26 @@ export async function findAllArticles(): Promise<ArticleRow[]> {
   );
 
   return articles;
+}
+
+export interface NewArticle {
+  title: string;
+  body: string;
+  category: string;
+  submittedBy: number;
+}
+
+export async function createArticle(article: NewArticle): Promise<number> {
+  const [result] = await db.execute<ResultSetHeader>(
+    `INSERT INTO articles (
+       title,
+       body,
+       category,
+       submitted_by
+     )
+     VALUES (?, ?, ?, ?)`,
+    [article.title, article.body, article.category, article.submittedBy],
+  );
+
+  return result.insertId;
 }
