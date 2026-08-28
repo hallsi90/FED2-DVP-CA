@@ -21,7 +21,9 @@
   },
   "homepage": "https://github.com/hallsi90/FED2-DVP-CA#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mysql2": "^3.24.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
