@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { db } from "../config/database.js";
+import { env } from "../config/env.js";
 
 interface UserRow extends RowDataPacket {
   id: number;
@@ -9,6 +11,7 @@ interface UserRow extends RowDataPacket {
 }
 
 const SALT_ROUNDS = 12;
+const JWT_EXPIRES_IN = "1h";
 
 export async function findUserByEmail(
   email: string,
@@ -37,4 +40,32 @@ export async function createUser(
   );
 
   return result.insertId;
+}
+
+export async function authenticateUser(
+  email: string,
+  password: string,
+): Promise<string | null> {
+  const user = await findUserByEmail(email);
+
+  if (!user) {
+    return null;
+  }
+
+  const passwordIsValid = await bcrypt.compare(password, user.password_hash);
+
+  if (!passwordIsValid) {
+    return null;
+  }
+
+  return jwt.sign(
+    {
+      userId: user.id,
+      email: user.email,
+    },
+    env.jwtSecret,
+    {
+      expiresIn: JWT_EXPIRES_IN,
+    },
+  );
 }

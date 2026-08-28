@@ -1,5 +1,9 @@
 import type { Request, Response } from "express";
-import { createUser, findUserByEmail } from "../services/auth.service.js";
+import {
+  authenticateUser,
+  createUser,
+  findUserByEmail,
+} from "../services/auth.service.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
@@ -53,6 +57,53 @@ export async function register(req: Request, res: Response): Promise<void> {
     });
   } catch (error) {
     console.error("Unable to register user:", error);
+
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+}
+
+export async function login(req: Request, res: Response): Promise<void> {
+  try {
+    const body = req.body as Record<string, unknown> | undefined;
+    const email = body?.email;
+    const password = body?.password;
+
+    if (typeof email !== "string" || typeof password !== "string") {
+      res.status(400).json({
+        message: "Email and password are required",
+      });
+      return;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (
+      !EMAIL_PATTERN.test(normalizedEmail) ||
+      password.length < MIN_PASSWORD_LENGTH
+    ) {
+      res.status(400).json({
+        message: "Email and password must be valid",
+      });
+      return;
+    }
+
+    const token = await authenticateUser(normalizedEmail, password);
+
+    if (!token) {
+      res.status(401).json({
+        message: "Invalid email or password",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+    });
+  } catch (error) {
+    console.error("Unable to log in:", error);
 
     res.status(500).json({
       message: "Internal server error",
