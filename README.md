@@ -62,8 +62,21 @@ The project separates responsibilities into routes, controllers, services, middl
 
 Before starting the project, install:
 
-- Node.js and npm
+- Node.js (npm is included with Node.js)
 - MySQL Community Server
+- curl for the optional command-line API test
+
+The project has been tested with Node.js 22.19.0, npm 10.9.3, and MySQL Community Server 8.4.11. Newer compatible versions may also work.
+
+Check the installed versions with:
+
+```bash
+node --version
+npm --version
+mysql --version
+```
+
+MySQL Workbench is optional. It can be used to inspect the database visually, but the application only requires MySQL Community Server.
 
 ## Installation
 
@@ -371,6 +384,52 @@ The project also passes:
 npm run typecheck
 npm run build
 git diff --check
+```
+
+### Quick API test with curl
+
+Keep the API running in one terminal using either `npm run dev` or `npm start`. Run the following commands in a second terminal from the project directory.
+
+Register a user:
+
+```bash
+curl -i -X POST http://localhost:3000/auth/register \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"teacher-test@example.com","password":"SecurePass123"}'
+```
+
+The first request returns `201 Created`. Repeating it with the same email returns `409 Conflict`.
+
+Log in and store the returned JWT in a temporary shell variable:
+
+```bash
+TOKEN=$(curl -s -X POST http://localhost:3000/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"teacher-test@example.com","password":"SecurePass123"}' \
+  | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).token")
+```
+
+Create an article using the JWT:
+
+```bash
+curl -i -X POST http://localhost:3000/articles \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"title":"API verification","body":"This article was created during the API test.","category":"Testing"}'
+```
+
+A successful request returns `201 Created`.
+
+Retrieve the articles without authentication:
+
+```bash
+curl -i http://localhost:3000/articles
+```
+
+A successful request returns `200 OK` and includes the newly created article. Remove the temporary token variable when the test is complete:
+
+```bash
+unset TOKEN
 ```
 
 ## Credits
