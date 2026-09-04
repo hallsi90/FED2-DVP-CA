@@ -3,6 +3,10 @@ import { db } from "./config/database.js";
 import { env } from "./config/env.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { articleRouter } from "./routes/article.routes.js";
+import {
+  errorHandler,
+  notFoundHandler,
+} from "./middleware/error.middleware.js";
 
 const app = express();
 
@@ -12,9 +16,12 @@ app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/articles", articleRouter);
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.json({ message: "API is running" });
 });
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 async function startServer(): Promise<void> {
   try {
