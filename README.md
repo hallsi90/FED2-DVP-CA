@@ -95,6 +95,8 @@ npm install
 
 ### 3. Import the database
 
+Make sure MySQL Community Server is running before importing the database.
+
 Import the included SQL file using the MySQL command-line client:
 
 ```bash
@@ -110,16 +112,25 @@ The SQL file creates the `news_api` database and the following tables:
 
 ### 4. Create the application database user
 
-Connect to MySQL as the root user:
+Choose a database password before connecting to MySQL. Copy the following `CREATE USER` statement into a text editor and replace `choose_a_database_password` with your chosen password. Do not use the placeholder as the password, and do not share or commit the real password.
+
+```sql
+CREATE USER IF NOT EXISTS 'news_api_app'@'localhost'
+IDENTIFIED BY 'choose_a_database_password';
+```
+
+After preparing the statement, connect to MySQL as the root user:
 
 ```bash
 mysql -u root -p
 ```
 
-Choose a database password before continuing. Copy the following `CREATE USER` statement into a text editor, replace `choose_a_database_password` with your chosen password, and only then paste the completed statement into the MySQL prompt. Do not use the placeholder as the password, and do not share or commit the real password.
+When the `mysql>` prompt appears, paste and run the completed `CREATE USER` statement.
+
+If MySQL reports a warning because `news_api_app` already exists, `CREATE USER IF NOT EXISTS` keeps the existing password. To replace it, prepare the following statement in a text editor in the same way, then run the completed statement in MySQL:
 
 ```sql
-CREATE USER IF NOT EXISTS 'news_api_app'@'localhost'
+ALTER USER 'news_api_app'@'localhost'
 IDENTIFIED BY 'choose_a_database_password';
 ```
 
@@ -149,23 +160,25 @@ Create a local `.env` file from the supplied example:
 cp .env.example .env
 ```
 
-Configure the values in `.env`:
+Generate a secure JWT secret using Node.js:
+
+```bash
+node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+```
+
+Copy the generated value, then configure the values in `.env`:
 
 ```env
 PORT=3000
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=news_api_app
-DB_PASSWORD=your_database_password
+DB_PASSWORD=replace_with_your_database_password
 DB_NAME=news_api
-JWT_SECRET=your_long_random_secret
+JWT_SECRET=replace_with_a_long_random_secret
 ```
 
-A secure JWT secret can be generated with:
-
-```bash
-openssl rand -hex 32
-```
+Replace `replace_with_your_database_password` with the password chosen in step 4. Replace `replace_with_a_long_random_secret` with the generated JWT secret.
 
 Never commit the `.env` file or real passwords, tokens, and secrets to GitHub.
 
@@ -178,6 +191,8 @@ npm run dev
 ```
 
 The server restarts automatically when a source file changes.
+
+Press `Ctrl+C` to stop the development server before continuing with the production build in the same terminal.
 
 ### Production build
 
@@ -193,7 +208,7 @@ Start the compiled server:
 npm start
 ```
 
-The API runs at:
+With the default `PORT=3000` configuration, the API runs at:
 
 ```text
 http://localhost:3000
@@ -386,7 +401,7 @@ The API has been tested manually with curl requests covering:
 - Unknown routes
 - Malformed JSON request bodies
 
-The project also passes:
+Before running the manual API test, open a second terminal in the project directory and run:
 
 ```bash
 npm run typecheck
@@ -397,6 +412,8 @@ git diff --check
 ### Quick API test with curl
 
 Keep the API running in one terminal using either `npm run dev` or `npm start`. Run the following commands in a second terminal from the project directory.
+
+The following commands use bash/zsh syntax and have been tested on macOS.
 
 Register a user:
 
@@ -443,12 +460,6 @@ unset TOKEN
 ## Credits
 
 Developed by Ingelinn Hallseth as part of the Development Platforms Course Assignment at Noroff.
-
-## AI usage
-
-OpenAI Codex was used as a support tool for project planning, concept explanations, troubleshooting, code review, manual test planning, and documentation guidance.
-
-All suggestions were reviewed, adapted, implemented, and tested by me. A detailed record of the AI-assisted work is maintained separately for the project submission.
 
 ## Contact
 
