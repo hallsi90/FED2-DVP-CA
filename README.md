@@ -116,20 +116,28 @@ Connect to MySQL as the root user:
 mysql -u root -p
 ```
 
-Create a restricted user for the application:
+Choose a database password before continuing. Copy the following `CREATE USER` statement into a text editor, replace `choose_a_database_password` with your chosen password, and only then paste the completed statement into the MySQL prompt. Do not use the placeholder as the password, and do not share or commit the real password.
 
 ```sql
 CREATE USER IF NOT EXISTS 'news_api_app'@'localhost'
 IDENTIFIED BY 'choose_a_database_password';
+```
 
+After MySQL returns `Query OK`, grant the application user the required permissions:
+
+```sql
 GRANT SELECT, INSERT
 ON news_api.*
 TO 'news_api_app'@'localhost';
+```
 
+Exit the MySQL prompt:
+
+```sql
 EXIT;
 ```
 
-Replace `choose_a_database_password` with a password of your choice. The same password must be used as `DB_PASSWORD` in the `.env` file.
+The same password must be used as `DB_PASSWORD` in the `.env` file.
 
 The application user only receives the database permissions required by the current API.
 
