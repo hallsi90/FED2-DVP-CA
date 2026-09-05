@@ -457,6 +457,8 @@ A successful request returns `200 OK` and includes the newly created article. Re
 unset TOKEN
 ```
 
+When testing is complete, return to the terminal running the API and press `Ctrl + C` to stop the server.
+
 ## Credits
 
 Developed by Ingelinn Hallseth as part of the Development Platforms Course Assignment at Noroff.
