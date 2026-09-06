@@ -23,8 +23,8 @@
 
 - **Tool used:** ChatGPT
 - **Date:** 5–6 September 2026
-- **Purpose:** Reflection report and AI log review.
-- **Outcome:** Helped me review the structure and wording of my reflection report to make the English clearer and more natural. It also helped me organize and rewrite my AI notes into a concise and easy-to-understand summary.
+- **Purpose:** Reflection report, AI log, and final project review.
+- **Outcome:** Helped me review the structure and wording of my reflection report, to make the English clearer and more natural, and organize my AI notes into a concise summary. It also helped me review the final code changes and verify the test results before submission.
 
 ---
 
