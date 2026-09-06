@@ -10,6 +10,16 @@ const MAX_EMAIL_LENGTH = 255;
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_BYTES = 72;
 
+interface MySqlError extends Error {
+  code?: string;
+}
+
+function isDuplicateEntryError(error: unknown): error is MySqlError {
+  return (
+    error instanceof Error && "code" in error && error.code === "ER_DUP_ENTRY"
+  );
+}
+
 function isValidEmail(email: string): boolean {
   return email.length <= MAX_EMAIL_LENGTH && EMAIL_PATTERN.test(email);
 }
@@ -80,6 +90,13 @@ export async function register(req: Request, res: Response): Promise<void> {
       },
     });
   } catch (error) {
+    if (isDuplicateEntryError(error)) {
+      res.status(409).json({
+        message: "A user with this email already exists",
+      });
+      return;
+    }
+
     console.error("Unable to register user:", error);
 
     res.status(500).json({

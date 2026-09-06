@@ -331,6 +331,7 @@ Article validation includes:
 - Title, body, and category are required
 - Titles cannot exceed 255 characters
 - Categories cannot exceed 100 characters
+- Article bodies cannot exceed 65,535 bytes
 
 ## Error responses
 
@@ -348,6 +349,7 @@ Examples include:
 - `401 Unauthorized` for missing, invalid, or expired authentication
 - `404 Not Found` for unknown routes
 - `409 Conflict` for an email address that already exists
+- `413 Payload Too Large` when the request body exceeds the server limit
 - `500 Internal Server Error` for unexpected server errors
 
 ## Database
@@ -400,6 +402,7 @@ The API has been tested manually with curl requests covering:
 - Authentication input boundaries
 - Unknown routes
 - Malformed JSON request bodies
+- Oversized article bodies and request payloads
 
 Before running the manual API test, open a second terminal in the project directory and run:
 

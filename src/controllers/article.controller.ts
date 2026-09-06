@@ -4,6 +4,8 @@ import {
   findAllArticles,
 } from "../services/article.service.js";
 
+const MAX_ARTICLE_BODY_BYTES = 65_535;
+
 export async function getAllArticles(
   _req: Request,
   res: Response,
@@ -52,6 +54,13 @@ export async function createArticle(
   if (!title || !body || !category) {
     res.status(400).json({
       message: "Title, body, and category are required",
+    });
+    return;
+  }
+
+  if (Buffer.byteLength(body, "utf8") > MAX_ARTICLE_BODY_BYTES) {
+    res.status(400).json({
+      message: "Article body must contain no more than 65,535 bytes",
     });
     return;
   }

@@ -5,6 +5,10 @@ interface JsonSyntaxError extends SyntaxError {
   body?: unknown;
 }
 
+interface HttpError extends Error {
+  status?: number;
+}
+
 function isJsonSyntaxError(error: unknown): error is JsonSyntaxError {
   return (
     error instanceof SyntaxError &&
@@ -12,6 +16,10 @@ function isJsonSyntaxError(error: unknown): error is JsonSyntaxError {
     error.status === 400 &&
     "body" in error
   );
+}
+
+function isPayloadTooLargeError(error: unknown): error is HttpError {
+  return error instanceof Error && "status" in error && error.status === 413;
 }
 
 export function notFoundHandler(req: Request, res: Response): void {
@@ -29,6 +37,13 @@ export function errorHandler(
   if (isJsonSyntaxError(error)) {
     res.status(400).json({
       message: "Request body contains invalid JSON",
+    });
+    return;
+  }
+
+  if (isPayloadTooLargeError(error)) {
+    res.status(413).json({
+      message: "Request body is too large",
     });
     return;
   }
